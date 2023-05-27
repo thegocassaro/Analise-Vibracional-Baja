@@ -23,10 +23,19 @@ dt = np.diff(t)[0]                  #acha dt
 #   data/PEDAL/x-PEDAL
 #   data/VOLANTE/VOLANTE
 
-file_path = 'data/ASSOALHO/1500-ASSOALHO.txt'
+file_path = 'data/ASSOALHO/2000-ASSOALHO.txt'
+
+vetor_time  = []
+vetor_x     = []
+vetor_y     = []
+vetor_z     = []
 
 with open(file_path, 'r') as file:
+
+    next(file) #pula a primeira linha
+
     for line in file:
+
             line = line.strip()
 
             if line : #checa se linha eh vazia
@@ -35,18 +44,52 @@ with open(file_path, 'r') as file:
 
                 numbers = re.findall(r'[-]*[\d]*[.][\d]+', line)  #ok, acha todos os floats
 
-                #if (time_aux[2] and time_aux[4] and time_aux[6]) > 1000 #acertar aqui pra quando não gravou o ponto do float
+                if len(numbers) < 3 :
+                    numbers.append("0.00000")           #preenche vetor numbers quando não consegue index 3 na leitura com 0 (gambiarra)
+
+                lista_float = [float (i) for i in time_aux] #cria uma lista de floats com os valores str de time_aux
 
 
-                time = time_aux[0]
-                x = numbers[0]
-                y = numbers[1]
-                z = numbers[2]
+                if len(lista_float) < 7 :                   #verifica os casos que falta ponto no numero float
+                                                            #ou que nao possui o primeiro algarismo
+                    for i in range(len(lista_float)) : 
 
-                
-                # Process the extracted values
-                print("Time:", time)
-                print("X:", x)
-                print("Y:", y)
-                print("Z:", z)
-            
+                        if lista_float[i] > 1000 :
+
+                            contador = 0
+                            
+                            while lista_float[i] > 0 :
+
+                                lista_float[i] /= 10
+
+                                contador += 1
+                                if contador == 8 : break            #as vezes dava loop infinito (gambiarra)
+
+                            
+                            if i == 1 :
+                                numbers[0] = lista_float[i]
+
+                            if i == 3 :
+                                numbers[1] = lista_float[i]
+
+                            if i == 5 :
+                                numbers[2] = lista_float[i]
+
+
+                time = float(time_aux[0])
+                x = float(numbers[0])
+                y = float(numbers[1])
+                z = float(numbers[2])
+
+                vetor_time.append(time)
+                vetor_x.append(x)
+                vetor_y.append(y)
+                vetor_z.append(z)
+
+
+
+    print("Time:", vetor_time)
+    print("X:", vetor_x)
+    print("Y:", vetor_y)
+    print("Z:", vetor_z)
+
